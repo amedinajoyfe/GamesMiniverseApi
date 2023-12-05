@@ -1,0 +1,9 @@
+package joyfe.joyfeSpring.secondaryClasses;
+
+public class Users {
+	long id;
+	String username;
+	String email;
+	String password;
+	
+}
