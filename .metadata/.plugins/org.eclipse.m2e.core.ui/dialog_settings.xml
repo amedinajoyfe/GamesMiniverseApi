@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\alejandro.medina.gal\Documents\GitHub\GamesMiniverseApi"/>
 			<item value="C:\Users\alexm\Documents\GitHub\GameMiniverseApi"/>
 		</list>
 		<list key="projectNameTemplate">
