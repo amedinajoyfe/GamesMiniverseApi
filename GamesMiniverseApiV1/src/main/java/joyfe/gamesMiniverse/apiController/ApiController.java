@@ -28,15 +28,14 @@ import joyfe.gamesMiniverse.services.UsersService;
 
 @Tag(name = "Tareas 1", description = "Documentacion de la api")
 @RestController
-@RequestMapping("/${api-version}/${apiName}")
+@RequestMapping("/${api-version}/${api-name}")
 @CrossOrigin(origins = "*", allowedHeaders = {"POST", "GET", "PUT"})
-
 public class ApiController {
 	@Autowired
 	UsersService usersService;
 	
 	@Operation(summary = "Comprobacion", description = "Este endpoint te comprobar si la Api está activa")
-	@GetMapping(path = "/${usersEndpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/${users-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String testApi() {
 		return "Hola";
 	}
@@ -44,55 +43,55 @@ public class ApiController {
 	@Operation(summary = "Comprobacion de JSON", description = "Este endpoint te comprobar si se reciben bien los JSON")
 	@GetMapping(path = "/testJson", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Map<String, Object> getData() {
-        // Create a map with two keys and two values
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("key4", "value1");
         responseData.put("key5", "value2");
 
-        // Return the map as JSON response
+        // Maps are converted to jsons on requests
         return responseData;
 	}
 	
-	@Operation(summary = "Guardar usuario", description = "Este endpoint te permite guardar un usuario")
+	@Operation(summary = "${get-user-title}", description = "${get-user-description}")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201", description = "Usuario creado correctamente"),
-			@ApiResponse(responseCode = "400", description = "Error inesperado"),
+			@ApiResponse(responseCode = "200", description = "${get-user-ok-response"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "404", description = "${user-not-found}")
 	})
-	@PostMapping(path = "/${usersEndpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/${users-endpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<User> getUserById(@PathVariable long id) {
+		return ResponseEntity.ok().body(usersService.getUserById(id));
+	}
+	
+	@Operation(summary = "${post-user-title}", description = "${post-user-description}")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "${post-user-ok-response"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}")
+	})
+	@PostMapping(path = "/${users-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> addUser(@RequestBody @Valid User newUser) throws URISyntaxException {
 		usersService.addUser(newUser);
 		return ResponseEntity.created(new URI("/users/" + newUser.getId())).body(newUser);
 	}
 	
-	@Operation(summary = "Buscar usuario", description = "Este endpoint te permite obtener el usuario cuyo Id sea introducido")
+	@Operation(summary = "${put-user-title}", description = "${put-user-description}")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Usuario encontrado"),
-			@ApiResponse(responseCode = "400", description = "Error inesperado"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+			@ApiResponse(responseCode = "201", description = "${put-user-ok-response"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "404", description = "${user-not-found}")
 	})
-	@GetMapping(path = "/${usersEndpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> getUserById(@PathVariable long id) {
-		return ResponseEntity.ok().body(usersService.getUserById(id));
-	}
-	
-	@Operation(summary = "Actualizar usuario", description = "Este endpoint te permite actualizar la información de un usuario")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201", description = "Usuario modificado correctamente"),
-			@ApiResponse(responseCode = "400", description = "Error inesperado"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-	})
-	@PutMapping(path = "/${usersEndpoint}/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(path = "/${users-endpoint}/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> updateTask(@PathVariable long id, @RequestBody @Valid User newTask) throws URISyntaxException {
 		return usersService.updateUser(id, newTask) ? ResponseEntity.created(new URI("/users/" + id)).body(newTask) : ResponseEntity.notFound().build();
 	}
 	
-	@Operation(summary = "Borrar usuario", description = "Este endpoint te permite eliminar un usuario")
+	@Operation(summary = "${delete-user-title}", description = "${delete-user-description}")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Usuario eliminado correctamente"),
-			@ApiResponse(responseCode = "400", description = "Error inesperado"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+			@ApiResponse(responseCode = "200", description = "${delete-user-ok-response"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "403", description = "${permission-denied}"),
+			@ApiResponse(responseCode = "404", description = "${user-not-found}")
 	})
-	@DeleteMapping(path = "/${usersEndpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(path = "/${users-endpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> deleteTask(@PathVariable long id) {
 		return usersService.deleteUser(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
