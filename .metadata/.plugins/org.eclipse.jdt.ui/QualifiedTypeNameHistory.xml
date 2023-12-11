@@ -3,7 +3,6 @@
     <fullyQualifiedTypeName name="joyfe.joyfeSpring.secondaryClasses.User"/>
     <fullyQualifiedTypeName name="jakarta.validation.constraints.Email"/>
     <fullyQualifiedTypeName name="jakarta.validation.constraints.Size"/>
-    <fullyQualifiedTypeName name="jakarta.validation.constraints.NotNull"/>
     <fullyQualifiedTypeName name="java.net.http.HttpHeaders"/>
     <fullyQualifiedTypeName name="org.springframework.http.HttpHeaders"/>
     <fullyQualifiedTypeName name="joyfe.gamesMiniverse.errors.CustomErrorMessage"/>
@@ -12,4 +11,10 @@
     <fullyQualifiedTypeName name="joyfe.gamesMiniverse.errors.CustomUserNotFound"/>
     <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.ResponseStatus"/>
     <fullyQualifiedTypeName name="org.springframework.http.HttpStatus"/>
+    <fullyQualifiedTypeName name="io.swagger.v3.oas.annotations.tags.Tag"/>
+    <fullyQualifiedTypeName name="joyfe.gamesMiniverse.secondaryClasses.HighScore"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="java.util.Comparator"/>
+    <fullyQualifiedTypeName name="jakarta.validation.constraints.NotNull"/>
+    <fullyQualifiedTypeName name="org.springframework.ui.Model"/>
 </qualifiedTypeNameHistroy>

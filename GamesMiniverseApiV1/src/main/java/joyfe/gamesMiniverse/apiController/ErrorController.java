@@ -7,13 +7,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import joyfe.gamesMiniverse.errors.CustomErrorMessage;
+import joyfe.gamesMiniverse.errors.CustomGameNotFound;
+import joyfe.gamesMiniverse.errors.CustomHighScoreNotFound;
 import joyfe.gamesMiniverse.errors.CustomUserNotFound;
 
 @RestControllerAdvice
-public class ErrorController extends ResponseEntityExceptionHandler{
+public class ErrorController extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(CustomUserNotFound.class)
 	ResponseEntity<CustomErrorMessage> handleUserNotFound(CustomUserNotFound ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
+	}
+
+	@ExceptionHandler(CustomGameNotFound.class)
+	ResponseEntity<CustomErrorMessage> handleGameNotFound(CustomGameNotFound ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
+	}
+	
+	@ExceptionHandler(CustomHighScoreNotFound.class)
+	ResponseEntity<CustomErrorMessage> handleHighScoreNotFound(CustomHighScoreNotFound ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
 	}
 }

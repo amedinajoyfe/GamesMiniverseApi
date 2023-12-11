@@ -1,45 +1,65 @@
 package joyfe.gamesMiniverse.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
+import joyfe.gamesMiniverse.errors.CustomGameNotFound;
 import joyfe.gamesMiniverse.errors.CustomUserNotFound;
+import joyfe.gamesMiniverse.secondaryClasses.Game;
+import joyfe.gamesMiniverse.secondaryClasses.HighScore;
 import joyfe.gamesMiniverse.secondaryClasses.User;
 
-@Service("subjectService")
-public class UsersService{
+@Service("usersService")
+public class UsersService {
 
 	List<User> userList = new ArrayList<>();
-	
+
 	public List<User> getUserList() {
 		return userList;
 	}
-	
-	public void addUser(User newTask) {
-		newTask.setId(generateIdUser());
-		userList.add(newTask);
+
+	public void addUser(User newUser) {
+		newUser.setId(generateIdUser());
+		userList.add(newUser);
 	}
+
 	public User getUserById(long id) {
-		return userList.stream().filter(task -> task.getId() == id).findFirst().orElseThrow(() -> new CustomUserNotFound(id));
+		return userList.stream().filter(x -> x.getId() == id).findFirst().orElseThrow(() -> new CustomUserNotFound(id));
 	}
-	public boolean updateUser(long id, User newTask) {
-		if(userList == null || id > userList.size() || id < 1)
+
+	public boolean updateUser(long id, User newUser) {
+		if (userList == null || id > userList.size() || id < 1)
 			return false;
-		newTask.setId(id);
-		userList.set((int)(id - 1), newTask);
+		newUser.setId(id);
+		userList.set((int) (id - 1), newUser);
 		return true;
 	}
+
 	public boolean deleteUser(long id) {
-		if(userList == null || id > userList.size() || id < 1)
+		if (userList == null || id > userList.size() || id < 1)
 			return false;
-		userList.set((int)(id - 1), new User());
+		userList.set((int) (id - 1), new User());
 		return true;
+	}
+
+	private long generateIdUser() {
+		return userList == null ? 0 : userList.size() + 1;
 	}
 	
-	private long generateIdUser() {
-		return userList == null? 0:userList.size() + 1;
+	public HighScore insertNewScore(long _gameId, long _userId, long _score) {
+		User userSearched = userList.stream().filter(x -> x.getId() == _userId).findFirst()
+				.orElseThrow(() -> new CustomUserNotFound(_userId));
+		return userSearched.addHighScore(_gameId, _score);
+	}
+
+	public HighScore getHighScore(long _gameId, long _userId) {
+		User userSearched = userList.stream().filter(x -> x.getId() == _userId).findFirst()
+				.orElseThrow(() -> new CustomUserNotFound(_userId));
+		HighScore searchedHighScore = userSearched.getHighScore(_gameId);
+		return searchedHighScore;
 	}
 }
