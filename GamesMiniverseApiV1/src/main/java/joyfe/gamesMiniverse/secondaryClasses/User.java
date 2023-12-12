@@ -17,7 +17,8 @@ public class User {
 	String email;
 	@NotNull(message = "La contraseña no puede estar vacía")
 	String password;
-	List<HighScore> highScores = new ArrayList<>();;
+	List<HighScore> highScores = new ArrayList<>();
+	List<Long> achievements = new ArrayList<>();
 
 	public long getId() {
 		return id;
@@ -50,6 +51,10 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	public List<Long> getAchievements(){
+		return achievements;
+	}
 
 	public HighScore addHighScore(long _gameId, long _score) {
 		HighScore previousScore = highScores.stream().filter(x -> x.getGameId() == _gameId).findFirst().orElse(null);
@@ -57,16 +62,23 @@ public class User {
 			HighScore newScore = new HighScore(_gameId, id, _score);
 			highScores.add(newScore);
 			return newScore;
-		}
-		else {
-			if(previousScore.getScore() < _score)
+		} else {
+			if (previousScore.getScore() < _score)
 				previousScore.setScore(_score);
 		}
 		return previousScore;
 	}
 
 	public HighScore getHighScore(long _gameId) {
-		return highScores.stream().filter(x -> x.getGameId() == _gameId).findFirst().orElseThrow(() -> new CustomHighScoreNotFound(id, _gameId));
+		return highScores.stream().filter(x -> x.getGameId() == _gameId).findFirst()
+				.orElseThrow(() -> new CustomHighScoreNotFound(id, _gameId));
 	}
 
+	public Achievement addAchievement(Achievement _newAchievement) {
+		if (!achievements.contains(_newAchievement.getId()))
+			achievements.add(_newAchievement.getId());
+		return _newAchievement;
+	}
+	
+	
 }

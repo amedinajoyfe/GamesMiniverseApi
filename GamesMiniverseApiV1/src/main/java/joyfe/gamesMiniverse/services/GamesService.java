@@ -40,7 +40,7 @@ public class GamesService {
 	public boolean deleteGame(long id) {
 		if (gameList == null || id > gameList.size() || id < 1)
 			return false;
-		gameList.set((int) (id - 1), new Game());
+		gameList.set((int) (id - 1), null);
 		return true;
 	}
 

@@ -1,15 +1,12 @@
 package joyfe.gamesMiniverse.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import joyfe.gamesMiniverse.errors.CustomGameNotFound;
 import joyfe.gamesMiniverse.errors.CustomUserNotFound;
-import joyfe.gamesMiniverse.secondaryClasses.Game;
+import joyfe.gamesMiniverse.secondaryClasses.Achievement;
 import joyfe.gamesMiniverse.secondaryClasses.HighScore;
 import joyfe.gamesMiniverse.secondaryClasses.User;
 
@@ -42,7 +39,7 @@ public class UsersService {
 	public boolean deleteUser(long id) {
 		if (userList == null || id > userList.size() || id < 1)
 			return false;
-		userList.set((int) (id - 1), new User());
+		userList.set((int) (id - 1), null);
 		return true;
 	}
 
@@ -61,5 +58,12 @@ public class UsersService {
 				.orElseThrow(() -> new CustomUserNotFound(_userId));
 		HighScore searchedHighScore = userSearched.getHighScore(_gameId);
 		return searchedHighScore;
+	}
+	
+	public Achievement insertAchievement(long _userId, Achievement _achievement) {
+		User userSearched = userList.stream().filter(x -> x.getId() == _userId).findFirst()
+				.orElseThrow(() -> new CustomUserNotFound(_userId));
+		if (!userSearched.getAchievements().contains(_achievement.getId()));
+		return userSearched.addAchievement(_achievement);
 	}
 }

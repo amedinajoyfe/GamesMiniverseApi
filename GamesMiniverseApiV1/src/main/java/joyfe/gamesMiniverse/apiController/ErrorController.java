@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import joyfe.gamesMiniverse.errors.CustomAchievementNotFound;
 import joyfe.gamesMiniverse.errors.CustomErrorMessage;
 import joyfe.gamesMiniverse.errors.CustomGameNotFound;
 import joyfe.gamesMiniverse.errors.CustomHighScoreNotFound;
@@ -28,6 +29,12 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(CustomHighScoreNotFound.class)
 	ResponseEntity<CustomErrorMessage> handleHighScoreNotFound(CustomHighScoreNotFound ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
+	}
+	
+	@ExceptionHandler(CustomAchievementNotFound.class)
+	ResponseEntity<CustomErrorMessage> handleAchievementNotFound(CustomAchievementNotFound ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(new CustomErrorMessage(HttpStatus.NOT_FOUND, ex.getMessage()));
 	}

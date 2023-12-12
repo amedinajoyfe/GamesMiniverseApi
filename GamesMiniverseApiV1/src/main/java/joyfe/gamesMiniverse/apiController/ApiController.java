@@ -3,6 +3,7 @@ package joyfe.gamesMiniverse.apiController;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -25,9 +26,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import joyfe.gamesMiniverse.secondaryClasses.Achievement;
 import joyfe.gamesMiniverse.secondaryClasses.Game;
 import joyfe.gamesMiniverse.secondaryClasses.HighScore;
 import joyfe.gamesMiniverse.secondaryClasses.User;
+import joyfe.gamesMiniverse.services.AchievementsService;
 import joyfe.gamesMiniverse.services.GamesService;
 import joyfe.gamesMiniverse.services.UsersService;
 
@@ -40,13 +43,18 @@ public class ApiController {
 
 	@Autowired
 	GamesService gamesService;
-	
+
+	@Autowired
+	AchievementsService achievementsService;
+
 	@Value("${users-endpoint}")
 	String usersEndpoint;
 	@Value("${games-endpoint}")
 	String gamesEndpoint;
 	@Value("${highscores-endpoint}")
 	String highscoresEndpoint;
+	@Value("${achievements-endpoint}")
+	String achievementsEndpoint;
 
 	// Testing calls //
 
@@ -99,7 +107,8 @@ public class ApiController {
 	@PutMapping(path = "/${users-endpoint}/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody @Valid User newUser)
 			throws URISyntaxException {
-		return usersService.updateUser(id, newUser) ? ResponseEntity.created(new URI(usersEndpoint + "/" + id)).body(newUser)
+		return usersService.updateUser(id, newUser)
+				? ResponseEntity.created(new URI(usersEndpoint + "/" + id)).body(newUser)
 				: ResponseEntity.notFound().build();
 	}
 
@@ -113,19 +122,44 @@ public class ApiController {
 	public ResponseEntity<User> deleteUser(@PathVariable long id) {
 		return usersService.deleteUser(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
-	
-	@Tag(name = "${users-api-title}", description = "${games-api-description}")
+
+	@Tag(name = "${users-api-title}")
 	@Operation(summary = "${get-user-highscores-title}", description = "${get-user-highscores-description}")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-highscores-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
 			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
-	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<HighScore> getUserHighScore(@PathVariable long id, @PathVariable long gameId) throws URISyntaxException {
+	@GetMapping(path = "/${users-endpoint}/{id}/${achievements-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<HighScore> getUserHighScore(@PathVariable long id, @PathVariable long gameId)
+			throws URISyntaxException {
 		return ResponseEntity.ok().body(usersService.getHighScore(gameId, id));
+	}
+	
+	@Tag(name = "${users-api-title}")
+	@Operation(summary = "${get-user-achievements-title}", description = "${get-user-achievements-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-achievements-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
+	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Long>> getUserAchievements(@PathVariable long id, @PathVariable long gameId)
+			throws URISyntaxException {
+		User searchedUser = usersService.getUserById(id);
+		return ResponseEntity.ok().body(searchedUser.getAchievements());
+	}
+
+	@Tag(name = "${users-api-title}")
+	@Operation(summary = "${post-user-achievements-title}", description = "${post-user-achievements-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${post-user-achievements-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
+	@PostMapping(path = "/${games-endpoint}/{id}/${highscores-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> addAchievementToUser(@PathVariable long id, @RequestBody Achievement newAchievement)
+			throws URISyntaxException {
+		usersService.getUserById(id);
+		achievementsService.getAchievementById(newAchievement.getId());
+		usersService.insertAchievement(id, newAchievement);
+		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint)).body(newAchievement);
 	}
 
 	// Game api //
-
 
 	@Tag(name = "${games-api-title}", description = "${games-api-description}")
 	@Operation(summary = "${get-game-title}", description = "${get-game-description}")
@@ -136,7 +170,7 @@ public class ApiController {
 	public ResponseEntity<Game> getGameById(@PathVariable long id) {
 		return ResponseEntity.ok().body(gamesService.getGameById(id));
 	}
-	
+
 	@Tag(name = "${games-api-title}")
 	@Operation(summary = "${post-game-title}", description = "${post-game-description}")
 	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${post-game-ok-response}"),
@@ -156,7 +190,8 @@ public class ApiController {
 	@PutMapping(path = "/${games-endpoint}/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Game> updateGame(@PathVariable long id, @RequestBody @Valid Game newGame)
 			throws URISyntaxException {
-		return gamesService.updateGame(id, newGame) ? ResponseEntity.created(new URI(gamesEndpoint + "/" + id)).body(newGame)
+		return gamesService.updateGame(id, newGame)
+				? ResponseEntity.created(new URI(gamesEndpoint + "/" + id)).body(newGame)
 				: ResponseEntity.notFound().build();
 	}
 
@@ -199,5 +234,55 @@ public class ApiController {
 		usersService.insertNewScore(id, newHighScore.getUserId(), newHighScore.getScore());
 		HighScore newScore = gamesService.insertNewScore(id, newHighScore.getUserId(), newHighScore.getScore());
 		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint)).body(newScore);
+	}
+
+	// Achievement api //
+
+	@Tag(name = "${achievements-api-title}", description = "${achievements-api-description}")
+	@Operation(summary = "${get-achievement-title}", description = "${get-achievement-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-achievement-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "404", description = "${achievement-not-found}") })
+	@GetMapping(path = "/${achievements-endpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> getAchievementById(@PathVariable long id) {
+		return ResponseEntity.ok().body(achievementsService.getAchievementById(id));
+	}
+
+	@Tag(name = "${achievements-api-title}")
+	@Operation(summary = "${post-achievement-title}", description = "${post-achievement-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${post-achievement-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
+
+	@PostMapping(path = "/${achievements-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> addAchievement(@RequestBody @Valid Achievement newAchievement)
+			throws URISyntaxException {
+		achievementsService.addAchievement(newAchievement);
+		return ResponseEntity.created(new URI(achievementsEndpoint + "/" + newAchievement.getId()))
+				.body(newAchievement);
+	}
+
+	@Tag(name = "${achievements-api-title}")
+	@Operation(summary = "${put-achievement-title}", description = "${put-achievement-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${put-achievement-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "404", description = "${achievement-not-found}") })
+	@PutMapping(path = "/${achievements-endpoint}/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> updateAchievement(@PathVariable long id,
+			@RequestBody @Valid Achievement newAchievement) throws URISyntaxException {
+		return achievementsService.updateAchievement(id, newAchievement)
+				? ResponseEntity.created(new URI(achievementsEndpoint + "/" + id)).body(newAchievement)
+				: ResponseEntity.notFound().build();
+	}
+
+	@Tag(name = "${achievements-api-title}")
+	@Operation(summary = "${delete-achievement-title}", description = "${delete-achievement-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${delete-achievement-ok-response}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
+			@ApiResponse(responseCode = "403", description = "${permission-denied}"),
+			@ApiResponse(responseCode = "404", description = "${achievement-not-found}") })
+	@DeleteMapping(path = "/${achievements-endpoint}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> deleteAchievement(@PathVariable long id) {
+		return achievementsService.deleteAchievement(id) ? ResponseEntity.ok().build()
+				: ResponseEntity.notFound().build();
 	}
 }
