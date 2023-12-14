@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class CustomUserNotFound extends RuntimeException {
 
 	public CustomUserNotFound(long id) {
-		super("No existe el usuario con id " + id);
+		super("No existe el usuario que ha buscado");
 	}
 }

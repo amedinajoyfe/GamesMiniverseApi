@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import joyfe.gamesMiniverse.errors.CustomAchievementNotFound;
+import joyfe.gamesMiniverse.errors.CustomGameNotFound;
 import joyfe.gamesMiniverse.secondaryClasses.Achievement;
 
 @Service("achievementsService")
@@ -26,7 +27,7 @@ public class AchievementsService {
 		return achievementList == null ? 0 : achievementList.size() + 1;
 	}
 	
-	public Achievement getAchievementById(long id) {
+	public Achievement getAchievementById(long id) throws CustomAchievementNotFound {
 		return achievementList.stream().filter(x -> x.getId() == id).findFirst().orElseThrow(() -> new CustomAchievementNotFound(id));
 	}
 

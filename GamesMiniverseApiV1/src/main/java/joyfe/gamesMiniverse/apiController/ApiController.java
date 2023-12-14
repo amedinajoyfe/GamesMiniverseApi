@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -37,7 +38,7 @@ import joyfe.gamesMiniverse.services.UsersService;
 
 @RestController
 @RequestMapping("/${api-version}/${api-name}")
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT })
 public class ApiController {
 	@Autowired
 	UsersService usersService;
@@ -134,7 +135,7 @@ public class ApiController {
 			throws URISyntaxException {
 		return ResponseEntity.ok().body(usersService.getHighScore(gameId, id));
 	}
-	
+
 	@Tag(name = "${users-api-title}")
 	@Operation(summary = "${get-user-achievements-title}", description = "${get-user-achievements-description}")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-achievements-ok-response}"),
@@ -157,7 +158,8 @@ public class ApiController {
 		usersService.getUserById(id);
 		Achievement addedAchievement = achievementsService.getAchievementById(achievementId);
 		usersService.insertAchievement(id, addedAchievement);
-		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint)).body(addedAchievement);
+		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint))
+				.body(addedAchievement);
 	}
 
 	// Game api //
@@ -285,5 +287,19 @@ public class ApiController {
 	public ResponseEntity<Achievement> deleteAchievement(@PathVariable long id) {
 		return achievementsService.deleteAchievement(id) ? ResponseEntity.ok().build()
 				: ResponseEntity.notFound().build();
+	}
+
+	// Login api //
+
+	@Tag(name = "${login-api-title}", description = "${login-api-description}")
+	@Operation(summary = "${login-title}", description = "${login-description}")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${login-ok-response}"),
+			@ApiResponse(responseCode = "404", description = "${user-not-found}"),
+			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
+	@PostMapping(path = "/${login-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> makeLogin(@RequestBody @Valid User _loggedUser) throws URISyntaxException {
+		if(usersService.logIn(_loggedUser))
+			return ResponseEntity.ok().build();
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 }

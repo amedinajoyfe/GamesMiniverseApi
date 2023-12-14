@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import joyfe.gamesMiniverse.errors.CustomGameNotFound;
+import joyfe.gamesMiniverse.errors.CustomUserNotFound;
 import joyfe.gamesMiniverse.secondaryClasses.Game;
 import joyfe.gamesMiniverse.secondaryClasses.HighScore;
 
@@ -25,7 +26,7 @@ public class GamesService {
 		gameList.add(newGame);
 	}
 
-	public Game getGameById(long id) {
+	public Game getGameById(long id) throws CustomGameNotFound {
 		return gameList.stream().filter(x -> x.getId() == id).findFirst().orElseThrow(() -> new CustomGameNotFound(id));
 	}
 
@@ -48,13 +49,13 @@ public class GamesService {
 		return gameList == null ? 0 : gameList.size() + 1;
 	}
 
-	public HighScore insertNewScore(long _gameId, long _userId, long _score) {
+	public HighScore insertNewScore(long _gameId, long _userId, long _score) throws CustomGameNotFound {
 		Game gameSearched = gameList.stream().filter(x -> x.getId() == _gameId).findFirst()
 				.orElseThrow(() -> new CustomGameNotFound(_gameId));
 		return gameSearched.addHighScore(_userId, _score);
 	}
 
-	public Map<Long, Long> getHighScores(long _gameId) {
+	public Map<Long, Long> getHighScores(long _gameId) throws CustomGameNotFound {
 		Game gameSearched = gameList.stream().filter(x -> x.getId() == _gameId).findFirst()
 				.orElseThrow(() -> new CustomGameNotFound(_gameId));
 		Map<Long, Long> responseData = new HashMap<>();
