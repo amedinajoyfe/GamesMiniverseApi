@@ -20,8 +20,10 @@ public class UsersService {
 	}
 
 	public void addUser(User newUser) {
-		newUser.setId(generateIdUser());
-		userList.add(newUser);
+		if(userList.stream().filter(x -> x.getEmail() == newUser.getEmail()).findAny().orElse(null) == null) {
+			newUser.setId(generateIdUser());
+			userList.add(newUser);
+		}
 	}
 
 	public User getUserById(long id) {

@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value=""/>
+		<item key="selection" value="Cross"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="cross"/>
+			<item value="${games-endpoint}/{id}/${highscores-endpoint}"/>
 			<item value="achievements"/>
 			<item value="e = &quot;${users-api-title}&quot;, description = &quot;${games-api-description}&quot;)"/>
 			<item value="&#x0D;&#x0A;&#x09;&#x09;return ResponseEntity.created(new URI(&quot;/games/&quot; + newGame.getId())).body(newGame);"/>
@@ -19,6 +21,7 @@
 			<item value="task"/>
 		</list>
 		<list key="replacehistory">
+			<item value=""/>
 			<item value="highscores"/>
 			<item value="highscore"/>
 			<item value="Juego"/>

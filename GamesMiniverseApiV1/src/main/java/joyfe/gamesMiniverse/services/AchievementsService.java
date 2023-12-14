@@ -3,9 +3,12 @@ package joyfe.gamesMiniverse.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import joyfe.gamesMiniverse.errors.CustomAchievementNotFound;
 import joyfe.gamesMiniverse.secondaryClasses.Achievement;
 
+@Service("achievementsService")
 public class AchievementsService {
 	
 	List<Achievement> achievementList = new ArrayList<>();

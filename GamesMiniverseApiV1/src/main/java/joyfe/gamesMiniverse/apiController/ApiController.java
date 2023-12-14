@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ import joyfe.gamesMiniverse.services.UsersService;
 
 @RestController
 @RequestMapping("/${api-version}/${api-name}")
-@CrossOrigin(origins = "*", allowedHeaders = { "POST", "GET", "PUT" })
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
 public class ApiController {
 	@Autowired
 	UsersService usersService;
@@ -128,7 +129,7 @@ public class ApiController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-highscores-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
 			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
-	@GetMapping(path = "/${users-endpoint}/{id}/${achievements-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<HighScore> getUserHighScore(@PathVariable long id, @PathVariable long gameId)
 			throws URISyntaxException {
 		return ResponseEntity.ok().body(usersService.getHighScore(gameId, id));
@@ -139,7 +140,7 @@ public class ApiController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-achievements-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
 			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
-	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/${users-endpoint}/{id}/${achievements-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Long>> getUserAchievements(@PathVariable long id, @PathVariable long gameId)
 			throws URISyntaxException {
 		User searchedUser = usersService.getUserById(id);
@@ -150,13 +151,13 @@ public class ApiController {
 	@Operation(summary = "${post-user-achievements-title}", description = "${post-user-achievements-description}")
 	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "${post-user-achievements-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
-	@PostMapping(path = "/${games-endpoint}/{id}/${highscores-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Achievement> addAchievementToUser(@PathVariable long id, @RequestBody Achievement newAchievement)
+	@PostMapping(path = "/${games-endpoint}/{id}/${achievements-endpoint}/{achievementId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Achievement> addAchievementToUser(@PathVariable long id, @PathVariable long achievementId)
 			throws URISyntaxException {
 		usersService.getUserById(id);
-		achievementsService.getAchievementById(newAchievement.getId());
-		usersService.insertAchievement(id, newAchievement);
-		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint)).body(newAchievement);
+		Achievement addedAchievement = achievementsService.getAchievementById(achievementId);
+		usersService.insertAchievement(id, addedAchievement);
+		return ResponseEntity.created(new URI(gamesEndpoint + "/" + id + "/" + highscoresEndpoint)).body(addedAchievement);
 	}
 
 	// Game api //
