@@ -74,10 +74,7 @@ public class UsersService {
 		return userSearched.addAchievement(_achievement);
 	}
 	
-	public boolean logIn(User _loggedUser) throws CustomInvalidLogin {
-		User userSearched = userList.stream().filter(x -> x.getUsername().compareTo(_loggedUser.getUsername()) == 0).findFirst().orElse(null);
-		if(userSearched == null || !passwordEncoder.verifyKeyFormatted(userSearched.getPassword(), _loggedUser.getPassword()))
-			return false;
-		return true;
+	public User logIn(User _loggedUser) throws CustomInvalidLogin {
+		return userList.stream().filter(x -> x.getUsername().compareTo(_loggedUser.getUsername()) == 0).findFirst().orElse(null);
 	}
 }

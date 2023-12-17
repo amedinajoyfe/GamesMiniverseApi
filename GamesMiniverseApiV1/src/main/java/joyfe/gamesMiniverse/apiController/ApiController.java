@@ -130,7 +130,7 @@ public class ApiController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-highscores-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
 			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
-	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<HighScore> getUserHighScore(@PathVariable long id, @PathVariable long gameId)
 			throws URISyntaxException {
 		return ResponseEntity.ok().body(usersService.getHighScore(gameId, id));
@@ -297,9 +297,10 @@ public class ApiController {
 			@ApiResponse(responseCode = "404", description = "${user-not-found}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
 	@PostMapping(path = "/${login-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Boolean> makeLogin(@RequestBody @Valid User _loggedUser) throws URISyntaxException {
-		if(usersService.logIn(_loggedUser))
-			return ResponseEntity.ok().build();
+	public ResponseEntity<User> makeLogin(@RequestBody @Valid User _loggedUser) throws URISyntaxException {
+		User loggedUser = usersService.logIn(_loggedUser);
+		if(loggedUser != null)
+			return ResponseEntity.ok().body(loggedUser);
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 }
