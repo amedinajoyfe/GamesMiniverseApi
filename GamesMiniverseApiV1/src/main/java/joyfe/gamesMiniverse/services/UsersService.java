@@ -23,12 +23,14 @@ public class UsersService {
 		return userList;
 	}
 
-	public void addUser(User newUser) {
+	public boolean addUser(User newUser) {
 		if(userList.stream().filter(x -> x.getUsername().compareTo(newUser.getUsername()) == 0).findFirst().orElse(null) == null) {
 			newUser.setId(generateIdUser());
 			newUser.setPassword(passwordEncoder.deriveKeyFormatted(newUser.getPassword()));
 			userList.add(newUser);
+			return true;
 		}
+		return false;
 	}
 
 	public User getUserById(long id) throws CustomUserNotFound {
@@ -60,11 +62,10 @@ public class UsersService {
 		return userSearched.addHighScore(_gameId, _score);
 	}
 
-	public HighScore getHighScore(long _gameId, long _userId) throws CustomUserNotFound {
+	public List<HighScore> getHighScores(long _userId) throws CustomUserNotFound {
 		User userSearched = userList.stream().filter(x -> x.getId() == _userId).findFirst()
 				.orElseThrow(() -> new CustomUserNotFound(_userId));
-		HighScore searchedHighScore = userSearched.getHighScore(_gameId);
-		return searchedHighScore;
+		return userSearched.getHighScores();
 	}
 	
 	public Achievement insertAchievement(long _userId, Achievement _achievement) throws CustomUserNotFound {

@@ -69,9 +69,8 @@ public class User {
 		return previousScore;
 	}
 
-	public HighScore getHighScore(long _gameId) {
-		return highScores.stream().filter(x -> x.getGameId() == _gameId).findFirst()
-				.orElseThrow(() -> new CustomHighScoreNotFound(id, _gameId));
+	public List<HighScore> getHighScores() {
+		return highScores;
 	}
 
 	public Achievement addAchievement(Achievement _newAchievement) {

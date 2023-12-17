@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -97,8 +98,9 @@ public class ApiController {
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}") })
 	@PostMapping(path = "/${users-endpoint}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> addUser(@RequestBody @Valid User newUser) throws URISyntaxException {
-		usersService.addUser(newUser);
-		return ResponseEntity.created(new URI(usersEndpoint + "/" + newUser.getId())).body(newUser);
+		if(usersService.addUser(newUser))
+			return ResponseEntity.created(new URI(usersEndpoint + "/" + newUser.getId())).body(newUser);
+		return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
 
 	@Tag(name = "${users-api-title}")
@@ -130,10 +132,10 @@ public class ApiController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "${get-user-highscores-ok-response}"),
 			@ApiResponse(responseCode = "400", description = "${unexpected-error}"),
 			@ApiResponse(responseCode = "404", description = "${user-not-found}") })
-	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<HighScore> getUserHighScore(@PathVariable long id, @PathVariable long gameId)
+	@GetMapping(path = "/${users-endpoint}/{id}/${highscores-endpoint}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<HighScore>> getUserHighScore(@PathVariable long id)
 			throws URISyntaxException {
-		return ResponseEntity.ok().body(usersService.getHighScore(gameId, id));
+		return ResponseEntity.ok().body(usersService.getHighScores(id));
 	}
 
 	@Tag(name = "${users-api-title}")
