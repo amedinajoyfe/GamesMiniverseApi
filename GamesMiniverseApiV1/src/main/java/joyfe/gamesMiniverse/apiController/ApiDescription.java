@@ -16,22 +16,40 @@ import io.swagger.v3.oas.models.servers.Server;
 public class ApiDescription {
 	@Value("${prod-url}")
 	private String prodUrl;
+	@Value("${server-desc}")
+	private String severDesc;
+	@Value("${api-name}")
+	private String apiName;
+	@Value("${contact}")
+	private String contact;
+	@Value("${license-name}")
+	private String licenseName;
+	@Value("${license-url}")
+	private String licenseUrl;
+	@Value("${info-title}")
+	private String infoTitle;
+	@Value("${info-desc}")
+	private String infoDesc;
+	@Value("${info-tos}")
+	private String infoTOS;
+	@Value("${info-version}")
+	private String infoVersion;
 
 	@Bean
 	public OpenAPI myOpenAPI() {
 		Server prodServer = new Server();
 		prodServer.setUrl(prodUrl);
-		prodServer.setDescription("Producción");
+		prodServer.setDescription(severDesc);
 
-		Contact contacto = new Contact().name("Games Miniverse")
-				.email("alejandro.medina.galan@alumnojoyfe.iepgroup.es");
+		Contact contacto = new Contact().name(apiName)
+				.email(contact);
 
-		License licencia = new License().name("MIT License").url("https://opensource.org/license/mit/");
+		License licencia = new License().name(licenseName).url(licenseUrl);
 
-		Info informacion = new Info().license(licencia).title("API REST GAMES MINIVERSE")
-				.description("API REST FOR THE GAMES MINIVERSE WEBPAGE")
-				.termsOfService("https://www.termsfeed.com/public/uploads/2021/12/sample-terms-of-service-template.pdf")
-				.contact(contacto).version("1.0");
+		Info informacion = new Info().license(licencia).title(infoTitle)
+				.description(infoDesc)
+				.termsOfService(infoTOS)
+				.contact(contacto).version(infoVersion);
 
 		return new OpenAPI().servers(List.of(prodServer)).info(informacion);
 	}
